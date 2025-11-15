@@ -197,9 +197,9 @@ const BattleMode = () => {
           filter: `id=eq.${sessionId}`,
         },
         (payload) => {
-          if (payload.new.status === 'playing' && mode === 'waiting') {
+          if (payload.new.status === 'playing') {
             setMode('playing');
-            startGame(sessionId);
+            startGame(sessionId, true);
           }
         }
       )
@@ -219,9 +219,13 @@ const BattleMode = () => {
       return;
     }
 
-    await startBattleSession(battleSession.id);
+    const ok = await startBattleSession(battleSession.id);
+    if (!ok) {
+      setError('게임 시작에 실패했습니다. 다시 시도해주세요.');
+      return;
+    }
     setMode('playing');
-    startGame(battleSession.id);
+    startGame(battleSession.id, true);
   };
 
   const loadParticipants = async (sessionId: string) => {
@@ -247,14 +251,17 @@ const BattleMode = () => {
     return () => clearInterval(interval);
   }, [battleSession?.id, mode]);
 
-  const startGame = async (sessionId: string) => {
+  const startGame = async (sessionId: string, isHostStart: boolean = false) => {
     setTimeLeft(BATTLE_DURATION);
     setScore(0);
     setCorrectCount(0);
     setFallingProblems([]);
     lastSpawnTimeRef.current = Date.now();
 
-    // 타이머 시작
+    // 타이머 시작 (중복 방지)
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+    }
     timerRef.current = setInterval(() => {
       setTimeLeft((prev) => {
         if (prev <= 1) {
@@ -270,17 +277,17 @@ const BattleMode = () => {
     }, 1000);
 
     // 게임 루프 시작
-    gameLoop();
+    gameLoop(isHostStart);
   };
 
-  const gameLoop = () => {
+  const gameLoop = (isHost: boolean) => {
     const animate = () => {
       if (mode !== 'playing') return;
 
       const now = Date.now();
       
       // 문제 생성
-      if (now - lastSpawnTimeRef.current >= PROBLEM_SPAWN_INTERVAL) {
+      if (isHost && now - lastSpawnTimeRef.current >= PROBLEM_SPAWN_INTERVAL) {
         spawnProblem();
         lastSpawnTimeRef.current = now;
       }
