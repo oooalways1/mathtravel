@@ -13,14 +13,21 @@ const Home = () => {
 
   if (!profile) return null;
 
-  const equippedItems = profile.character.items?.filter((item) => item.equipped) ?? [];
+  const character = profile.character ?? {
+    avatar: '🙂',
+    level: 1,
+    experience: 0,
+    items: [],
+  };
+
+  const equippedItems = character.items?.filter((item) => item.equipped) ?? [];
   const getEquippedItem = (type: 'hat' | 'clothes' | 'accessory' | 'character') =>
     equippedItems.find((item) => item.type === type);
 
   const hatItem = getEquippedItem('hat');
   const clothesItem = getEquippedItem('clothes');
   const accessoryItem = getEquippedItem('accessory');
-  const baseAvatar = profile.character.avatar || '🙂';
+  const baseAvatar = character.avatar || '🙂';
   const homeBgmId = 'oj4OGAAcBb4';
 
   const handleLogout = async () => {
@@ -130,7 +137,7 @@ const Home = () => {
                   곱셈과 나눗셈 모험을 떠나요!
                 </h1>
                 <p className="text-gray-600 mt-1">
-                  안녕하세요, {profile.name}님! 레벨 {profile.character.level} • 경험치 {profile.character.experience}
+                  안녕하세요, {profile.name}님! 레벨 {character.level} • 경험치 {character.experience}
                 </p>
               </div>
             </div>
@@ -172,13 +179,13 @@ const Home = () => {
           {/* 진행 바 */}
           <div className="mt-6">
             <div className="flex justify-between text-sm text-gray-600 mb-2">
-              <span>레벨 {profile.character.level}</span>
-              <span>레벨 {profile.character.level + 1}까지 {100 - (profile.character.experience % 100)} EXP</span>
+              <span>레벨 {character.level}</span>
+              <span>레벨 {character.level + 1}까지 {100 - (character.experience % 100)} EXP</span>
             </div>
             <div className="w-full bg-gray-200 rounded-full h-4 overflow-hidden">
               <motion.div
                 initial={{ width: 0 }}
-                animate={{ width: `${(profile.character.experience % 100)}%` }}
+                animate={{ width: `${(character.experience % 100)}%` }}
                 transition={{ duration: 1, ease: 'easeOut' }}
                 className="bg-gradient-to-r from-primary-400 to-primary-600 h-full rounded-full"
               />
