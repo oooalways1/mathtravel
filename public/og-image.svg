@@ -1,0 +1,19 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fceabb" />
+      <stop offset="100%" stop-color="#f8b500" />
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#grad)" />
+  <g font-family="Pretendard, 'Noto Sans KR', sans-serif" text-anchor="middle">
+    <text x="600" y="260" font-size="72" font-weight="700" fill="#9a4800">
+      곱셈과 나눗셈 모험을 떠나요!
+    </text>
+    <text x="600" y="360" font-size="40" fill="#7b3f00">
+      다양한 미니게임과 문제풀이로 성장하는 수학 모험
+    </text>
+    <text x="600" y="430" font-size="36">✖️ ➗ 🎯 ⭐</text>
+  </g>
+</svg>
+

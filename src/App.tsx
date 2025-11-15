@@ -46,8 +46,13 @@ function App() {
     };
   }, [profile, loadProfileFromServer]);
 
+  const basename =
+    import.meta.env.BASE_URL && import.meta.env.BASE_URL !== '/'
+      ? import.meta.env.BASE_URL.replace(/\/+$/, '')
+      : ''
+
   return (
-    <Router basename={import.meta.env.PROD ? '/251106-vibe' : ''}>
+    <Router basename={basename}>
       <GlobalControls />
       <Routes>
         <Route path="/" element={profile ? <Navigate to="/home" /> : <Welcome />} />
