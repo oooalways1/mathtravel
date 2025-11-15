@@ -116,6 +116,11 @@ CREATE POLICY "Authenticated users can create battle sessions"
   ON battle_sessions FOR INSERT
   WITH CHECK (auth.role() = 'authenticated');
 
+DROP POLICY IF EXISTS "Hosts can update battle sessions" ON battle_sessions;
+CREATE POLICY "Hosts can update battle sessions"
+  ON battle_sessions FOR UPDATE
+  USING (auth.uid() = host_id);
+
 -- 모든 사용자가 참가자 정보 조회 가능
 DROP POLICY IF EXISTS "Anyone can view battle participants" ON battle_participants;
 CREATE POLICY "Anyone can view battle participants"
@@ -143,3 +148,33 @@ BEGIN
   WHERE id = session_id AND current_players < max_players;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- 참가자 목록 + 프로필 조회 함수 (RLS 우회용)
+CREATE OR REPLACE FUNCTION get_battle_participants_with_profile(session_id UUID)
+RETURNS TABLE (
+  id UUID,
+  battle_session_id UUID,
+  user_id UUID,
+  username TEXT,
+  name TEXT,
+  score INT,
+  correct_count INT,
+  joined_at TIMESTAMPTZ
+) AS $$
+  SELECT
+    bp.id,
+    bp.battle_session_id,
+    bp.user_id,
+    up.username,
+    up.name,
+    bp.score,
+    bp.correct_count,
+    bp.joined_at
+  FROM battle_participants bp
+  JOIN user_profiles up ON up.id = bp.user_id
+  WHERE bp.battle_session_id = session_id
+  ORDER BY bp.score DESC;
+$$ LANGUAGE sql SECURITY DEFINER;
+
+GRANT EXECUTE ON FUNCTION get_battle_participants_with_profile(UUID) TO authenticated;
+GRANT EXECUTE ON FUNCTION get_battle_participants_with_profile(UUID) TO anon;

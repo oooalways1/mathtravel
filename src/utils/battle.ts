@@ -165,17 +165,10 @@ export async function getBattleParticipants(
   sessionId: string
 ): Promise<BattleParticipant[]> {
   try {
-    const { data, error } = await supabase
-      .from('battle_participants')
-      .select(`
-        *,
-        user_profiles:user_id (
-          username,
-          name
-        )
-      `)
-      .eq('battle_session_id', sessionId)
-      .order('score', { ascending: false });
+    const { data, error } = await supabase.rpc(
+      'get_battle_participants_with_profile',
+      { session_id: sessionId }
+    );
 
     if (error) throw error;
 
@@ -183,8 +176,8 @@ export async function getBattleParticipants(
       id: participant.id,
       battleSessionId: participant.battle_session_id,
       userId: participant.user_id,
-      username: participant.user_profiles?.username || '알 수 없음',
-      name: participant.user_profiles?.name || '알 수 없음',
+      username: participant.username || '알 수 없음',
+      name: participant.name || '알 수 없음',
       score: participant.score || 0,
       correctCount: participant.correct_count || 0,
       joinedAt: new Date(participant.joined_at).getTime(),
