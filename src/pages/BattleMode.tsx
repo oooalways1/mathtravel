@@ -16,6 +16,7 @@ import {
 import { generateProblem } from '../utils/problemGenerator';
 import { checkAnswer } from '../utils/problemGenerator';
 import type { FallingProblem, BattleParticipant, BattleSession } from '../types';
+import type { RealtimeChannel } from '@supabase/supabase-js';
 import { apiClient } from '../utils/api';
 
 const BATTLE_DURATION = 120; // 2분 (120초)
@@ -51,6 +52,12 @@ const BattleMode = () => {
   const animationFrameRef = useRef<number | null>(null);
   const lastSpawnTimeRef = useRef<number>(0);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const channelRef = useRef<RealtimeChannel | null>(null);
+  const isHostRef = useRef(false);
+
+  useEffect(() => {
+    isHostRef.current = isHost;
+  }, [isHost]);
 
   useEffect(() => {
     if (!profile) {
@@ -199,14 +206,28 @@ const BattleMode = () => {
         (payload) => {
           if (payload.new.status === 'playing') {
             setMode('playing');
-            startGame(sessionId, true);
+            startGame(sessionId, false);
           }
         }
       )
+      .on('broadcast', { event: 'spawn_problem' }, ({ payload }) => {
+        if (!payload) return;
+        if (payload.origin === profile?.id) return;
+        const problem = payload.problem as FallingProblem;
+        setFallingProblems((prev) => [...prev, problem]);
+      })
+      .on('broadcast', { event: 'resolve_problem' }, ({ payload }) => {
+        if (!payload) return;
+        if (payload.origin === profile?.id) return;
+        setFallingProblems((prev) => prev.filter((p) => p.id !== payload.problemId));
+      })
       .subscribe();
+
+    channelRef.current = channel;
 
     return () => {
       channel.unsubscribe();
+      channelRef.current = null;
     };
   };
 
@@ -280,14 +301,22 @@ const BattleMode = () => {
     gameLoop(isHostStart);
   };
 
-  const gameLoop = (isHost: boolean) => {
+  const gameLoop = (isHostStarter: boolean) => {
     const animate = () => {
       if (mode !== 'playing') return;
 
       const now = Date.now();
       
       // 문제 생성
-      if (isHost && now - lastSpawnTimeRef.current >= PROBLEM_SPAWN_INTERVAL) {
+      if (isHostStarter && now - lastSpawnTimeRef.current >= PROBLEM_SPAWN_INTERVAL) {
+        const newProblem = spawnProblem();
+        if (newProblem) {
+          channelRef.current?.send({
+            type: 'broadcast',
+            event: 'spawn_problem',
+            payload: { origin: profile?.id, problem: newProblem },
+          });
+        }
         spawnProblem();
         lastSpawnTimeRef.current = now;
       }
@@ -324,6 +353,7 @@ const BattleMode = () => {
       y: 0,
     } as FallingProblem;
     setFallingProblems((prev) => [...prev, fallingProblem]);
+    return fallingProblem;
   };
 
   const handleAnswer = async (problem: FallingProblem) => {
@@ -341,6 +371,11 @@ const BattleMode = () => {
       setShowFeedback('correct');
       
       setFallingProblems((prev) => prev.filter((p) => p.id !== problem.id));
+      channelRef.current?.send({
+        type: 'broadcast',
+        event: 'resolve_problem',
+        payload: { origin: profile?.id, problemId: problem.id },
+      });
 
       if (battleSession) {
         await updateBattleScore(battleSession.id, profile!.id, newScore, newCorrectCount);
