@@ -20,7 +20,8 @@ const Home = () => {
     items: [],
   };
 
-  const equippedItems = character.items?.filter((item) => item.equipped) ?? [];
+  const characterItems = Array.isArray(character.items) ? character.items : [];
+  const equippedItems = characterItems.filter((item) => item?.equipped);
   const getEquippedItem = (type: 'hat' | 'clothes' | 'accessory' | 'character') =>
     equippedItems.find((item) => item.type === type);
 
