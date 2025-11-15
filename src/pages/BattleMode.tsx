@@ -40,7 +40,7 @@ const BattleMode = () => {
   const [isHost, setIsHost] = useState(false);
   const [error, setError] = useState('');
   useBgm(
-    'https://cdn.pixabay.com/download/audio/2022/10/09/audio_fbb99d9db0.mp3?filename=epic-battle-music-121123.mp3',
+    'https://assets.mixkit.co/music/preview/mixkit-epic-battle-trailer-2229.mp3',
     {
       play: mode === 'playing',
       volume: 0.25,
@@ -225,9 +225,27 @@ const BattleMode = () => {
   };
 
   const loadParticipants = async (sessionId: string) => {
-    const data = await getBattleParticipants(sessionId);
-    setParticipants(data);
+    try {
+      const data = await getBattleParticipants(sessionId);
+      setParticipants(data);
+    } catch (error) {
+      console.error('참가자 목록 조회 오류:', error);
+    }
   };
+
+  useEffect(() => {
+    if (!battleSession) return;
+    loadParticipants(battleSession.id);
+  }, [battleSession?.id]);
+
+  useEffect(() => {
+    if (!battleSession || mode !== 'waiting') return;
+    loadParticipants(battleSession.id);
+    const interval = setInterval(() => {
+      loadParticipants(battleSession.id);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, [battleSession?.id, mode]);
 
   const startGame = async (sessionId: string) => {
     setTimeLeft(BATTLE_DURATION);
