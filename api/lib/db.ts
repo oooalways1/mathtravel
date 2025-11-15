@@ -1,6 +1,6 @@
-import type { UserProfile } from '../../src/types';
+import type { UserProfile } from '../../src/types/index.js';
 
-// 간단한 인메모리 데이터베이스 (실제 프로덕션에서는 PostgreSQL, MongoDB 등 사용)
+// 간단???�메모리 ?�이?�베?�스 (?�제 ?�로?�션?�서??PostgreSQL, MongoDB ???�용)
 interface User {
   id: string;
   email: string;
@@ -16,15 +16,15 @@ interface UserData {
 const users: Map<string, User> = new Map();
 const userProfiles: UserData = {};
 
-// 기본 프로필 생성 함수
+// 기본 ?�로???�성 ?�수
 function createDefaultProfile(userId: string, userName: string): UserProfile {
   return {
     id: userId,
     name: userName,
     character: {
       id: 'char_1',
-      name: '수학 탐험가',
-      avatar: '🧑‍🎓',
+      name: '?�학 ?�험가',
+      avatar: '?��?��?,
       level: 1,
       experience: 0,
       items: [],
@@ -61,54 +61,54 @@ function createDefaultProfile(userId: string, userName: string): UserProfile {
     achievements: [
       {
         id: 'first_problem',
-        title: '첫 걸음',
-        description: '첫 문제를 풀었어요!',
-        icon: '🎯',
+        title: '�?걸음',
+        description: '�?문제�??�?�어??',
+        icon: '?��',
         unlocked: false,
         progress: 0,
         target: 1,
       },
       {
         id: 'ten_problems',
-        title: '열심히 공부',
-        description: '문제 10개를 풀었어요!',
-        icon: '📚',
+        title: '?�심??공�?',
+        description: '문제 10개�? ?�?�어??',
+        icon: '?��',
         unlocked: false,
         progress: 0,
         target: 10,
       },
       {
         id: 'perfect_score',
-        title: '완벽해요!',
-        description: '10문제를 연속으로 맞췄어요!',
-        icon: '⭐',
+        title: '?�벽?�요!',
+        description: '10문제�??�속?�로 맞췄?�요!',
+        icon: '�?,
         unlocked: false,
         progress: 0,
         target: 10,
       },
       {
         id: 'week_streak',
-        title: '꾸준함의 힘',
-        description: '7일 연속 학습했어요!',
-        icon: '🔥',
+        title: '꾸�??�의 ??,
+        description: '7???�속 ?�습?�어??',
+        icon: '?��',
         unlocked: false,
         progress: 0,
         target: 7,
       },
       {
         id: 'multiplication_master',
-        title: '곱셈 마스터',
-        description: '곱셈 문제 50개를 풀었어요!',
-        icon: '✖️',
+        title: '곱셈 마스??,
+        description: '곱셈 문제 50개�? ?�?�어??',
+        icon: '?�️',
         unlocked: false,
         progress: 0,
         target: 50,
       },
       {
         id: 'division_master',
-        title: '나눗셈 마스터',
-        description: '나눗셈 문제 50개를 풀었어요!',
-        icon: '➗',
+        title: '?�눗??마스??,
+        description: '?�눗??문제 50개�? ?�?�어??',
+        icon: '??,
         unlocked: false,
         progress: 0,
         target: 50,
@@ -140,7 +140,7 @@ export const db = {
     };
     users.set(user.id, user);
     
-    // 기본 프로필 생성
+    // 기본 ?�로???�성
     userProfiles[user.id] = createDefaultProfile(user.id, user.name);
     
     return user;
@@ -166,7 +166,7 @@ export const db = {
     const updatedProfile: UserProfile = {
       ...currentProfile,
       ...updates,
-      id: userId, // ID는 변경 불가
+      id: userId, // ID??변�?불�?
       updatedAt: Date.now(),
     };
     userProfiles[userId] = updatedProfile;

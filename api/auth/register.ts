@@ -1,7 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
-import { db } from '../lib/db';
+import { db } from '../lib/db.js';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
 
@@ -14,30 +14,30 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const { email, password, name } = req.body;
 
     if (!email || !password || !name) {
-      return res.status(400).json({ success: false, message: '모든 필드를 입력해주세요.' });
+      return res.status(400).json({ success: false, message: '모든 ?�드�??�력?�주?�요.' });
     }
 
     if (password.length < 6) {
-      return res.status(400).json({ success: false, message: '비밀번호는 최소 6자 이상이어야 합니다.' });
+      return res.status(400).json({ success: false, message: '비�?번호??최소 6???�상?�어???�니??' });
     }
 
-    // 이메일 중복 체크
+    // ?�메??중복 체크
     const existingUser = await db.getUserByEmail(email);
     if (existingUser) {
-      return res.status(400).json({ success: false, message: '이미 사용 중인 이메일입니다.' });
+      return res.status(400).json({ success: false, message: '?��? ?�용 중인 ?�메?�입?�다.' });
     }
 
-    // 비밀번호 해시
+    // 비�?번호 ?�시
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // 사용자 생성
+    // ?�용???�성
     const user = await db.createUser({
       email,
       password: hashedPassword,
       name,
     });
 
-    // JWT 토큰 생성
+    // JWT ?�큰 ?�성
     const token = jwt.sign({ userId: user.id, email: user.email }, JWT_SECRET, {
       expiresIn: '30d',
     });
@@ -54,7 +54,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     });
   } catch (error) {
     console.error('Register error:', error);
-    res.status(500).json({ success: false, message: '서버 오류가 발생했습니다.' });
+    res.status(500).json({ success: false, message: '?�버 ?�류가 발생?�습?�다.' });
   }
 }
 
