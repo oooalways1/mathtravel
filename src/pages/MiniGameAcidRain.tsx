@@ -30,8 +30,8 @@ const MiniGameAcidRain = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [difficulty, setDifficulty] = useState<'easy' | 'medium' | 'hard'>('easy');
 
-  const spawnTimerRef = useRef<NodeJS.Timeout>();
-  const animationRef = useRef<number>();
+  const spawnTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const animationRef = useRef<number | null>(null);
   const lastTimestampRef = useRef<number>(0);
 
   const resetGame = () => {
@@ -68,8 +68,14 @@ const MiniGameAcidRain = () => {
   const endGame = (interrupted = false) => {
     setIsPlaying(false);
     setDrops([]);
-    clearInterval(spawnTimerRef.current);
-    cancelAnimationFrame(animationRef.current || 0);
+    if (spawnTimerRef.current) {
+      clearInterval(spawnTimerRef.current);
+      spawnTimerRef.current = null;
+    }
+    if (animationRef.current !== null) {
+      cancelAnimationFrame(animationRef.current);
+      animationRef.current = null;
+    }
     if (!interrupted && score > 0) {
       addMiniGameScore(score);
       addCoins(Math.floor(score / 50));
@@ -106,8 +112,14 @@ const MiniGameAcidRain = () => {
     animationRef.current = requestAnimationFrame(handleAnimation);
 
     return () => {
-      clearInterval(spawnTimerRef.current);
-      cancelAnimationFrame(animationRef.current || 0);
+      if (spawnTimerRef.current) {
+        clearInterval(spawnTimerRef.current);
+        spawnTimerRef.current = null;
+      }
+      if (animationRef.current !== null) {
+        cancelAnimationFrame(animationRef.current);
+        animationRef.current = null;
+      }
       lastTimestampRef.current = 0;
     };
   }, [isPlaying, difficulty]);

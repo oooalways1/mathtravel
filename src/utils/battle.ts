@@ -106,6 +106,8 @@ export async function getWaitingBattleSession(): Promise<BattleSession | null> {
 
     return {
       id: data.id,
+      roomCode: data.room_code,
+      hostId: data.host_id,
       createdAt: new Date(data.created_at).getTime(),
       endedAt: data.ended_at ? new Date(data.ended_at).getTime() : undefined,
       status: data.status as 'waiting' | 'playing' | 'ended',

@@ -48,9 +48,9 @@ const BattleMode = () => {
   );
   
   const gameAreaRef = useRef<HTMLDivElement>(null);
-  const animationFrameRef = useRef<number>();
+  const animationFrameRef = useRef<number | null>(null);
   const lastSpawnTimeRef = useRef<number>(0);
-  const timerRef = useRef<NodeJS.Timeout>();
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
     if (!profile) {
@@ -59,11 +59,13 @@ const BattleMode = () => {
     }
 
     return () => {
-      if (animationFrameRef.current) {
+      if (animationFrameRef.current !== null) {
         cancelAnimationFrame(animationFrameRef.current);
+        animationFrameRef.current = null;
       }
       if (timerRef.current) {
         clearInterval(timerRef.current);
+        timerRef.current = null;
       }
     };
   }, [profile, navigate]);
@@ -240,6 +242,7 @@ const BattleMode = () => {
         if (prev <= 1) {
           if (timerRef.current) {
             clearInterval(timerRef.current);
+            timerRef.current = null;
           }
           endGame(sessionId);
           return 0;
@@ -249,10 +252,10 @@ const BattleMode = () => {
     }, 1000);
 
     // 게임 루프 시작
-    gameLoop(sessionId);
+    gameLoop();
   };
 
-  const gameLoop = (sessionId: string) => {
+  const gameLoop = () => {
     const animate = () => {
       if (mode !== 'playing') return;
 

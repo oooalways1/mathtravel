@@ -239,7 +239,7 @@ const defaultSettings: GameSettings = {
 };
 
 // 프로필 동기화를 위한 debounce 타이머
-let syncTimer: NodeJS.Timeout | null = null;
+let syncTimer: ReturnType<typeof setTimeout> | null = null;
 
 const debouncedSync = (syncFn: () => Promise<void>) => {
   if (syncTimer) {
@@ -440,6 +440,8 @@ export const useGameStore = create<GameState>()(
           if (!state.profile) return state;
           
           const targetItem = state.profile.character.items.find((i) => i.id === itemId);
+          const isEquipping = targetItem ? !targetItem.equipped : false;
+
           const items = state.profile.character.items.map((item) => {
             if (item.id === itemId) {
               return { ...item, equipped: !item.equipped };
@@ -450,20 +452,18 @@ export const useGameStore = create<GameState>()(
             return item;
           });
 
-          const isEquipping = targetItem ? !targetItem.equipped : false;
-          const characterStyle = {
-            hat: hatItemImage(state.profile.character.items, itemId, isEquipping),
-            clothes: clothesItemImage(state.profile.character.items, itemId, isEquipping),
-            accessory: accessoryItemImage(state.profile.character.items, itemId, isEquipping),
-          };
+          let avatar = state.profile.character.avatar;
+          if (targetItem && targetItem.type === 'character') {
+            avatar = isEquipping ? targetItem.image : defaultCharacter.avatar;
+          }
           
           return {
             profile: {
               ...state.profile,
               character: {
                 ...state.profile.character,
+                avatar,
                 items,
-                avatar: state.profile.character.avatar,
               },
               updatedAt: Date.now(),
             },
@@ -480,12 +480,18 @@ export const useGameStore = create<GameState>()(
             if (!state.profile) return state;
 
             const newItem = { ...item, owned: true, equipped: true };
+
+            let avatar = state.profile.character.avatar;
+            if (item.type === 'character') {
+              avatar = item.image;
+            }
             
             return {
               profile: {
                 ...state.profile,
                 character: {
                   ...state.profile.character,
+                  avatar,
                   items: [
                     ...state.profile.character.items
                       .filter((existing) => existing.id !== item.id)
@@ -788,15 +794,19 @@ export const useGameStore = create<GameState>()(
       addMiniGameScore: (score) => {
         set((state) => {
           if (!state.profile) return state;
-
+          
           const currentBest = state.profile.stats.miniGameScore || 0;
-          if (score <= currentBest) return state;
-
+          const bestScore = Math.max(currentBest, score);
+          
+          if (bestScore === currentBest) {
+            return state;
+          }
+          
           const newProfile = {
             ...state.profile,
             stats: {
               ...state.profile.stats,
-              miniGameScore: score,
+              miniGameScore: bestScore,
             },
             updatedAt: Date.now(),
           };

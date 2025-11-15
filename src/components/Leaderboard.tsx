@@ -110,15 +110,6 @@ const Leaderboard = ({ type, limit = 10, showUserRank = true }: LeaderboardProps
     return () => clearInterval(interval);
   }, [type, limit, showUserRank, profile]);
 
-  const formatTime = (seconds: number): string => {
-    const hours = Math.floor(seconds / 3600);
-    const minutes = Math.floor((seconds % 3600) / 60);
-    if (hours > 0) {
-      return `${hours}시간 ${minutes}분`;
-    }
-    return `${minutes}분`;
-  };
-
   const getRankIcon = (index: number): string => {
     if (index === 0) return '🥇';
     if (index === 1) return '🥈';

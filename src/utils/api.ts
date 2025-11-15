@@ -1,45 +1,13 @@
 import type { AuthResponse, LoginRequest, RegisterRequest, UserProfile } from '../types';
 import { supabase } from './supabase';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
-
 // API 클라이언트 클래스
 class ApiClient {
-  private baseUrl: string;
   private token: string | null = null;
 
-  constructor(baseUrl: string) {
-    this.baseUrl = baseUrl;
+  constructor() {
     // 로컬 스토리지에서 토큰 로드
     this.token = localStorage.getItem('auth_token');
-  }
-
-  private async request<T>(
-    endpoint: string,
-    options: RequestInit = {}
-  ): Promise<T> {
-    const url = `${this.baseUrl}${endpoint}`;
-    const headers: HeadersInit = {
-      'Content-Type': 'application/json',
-      ...options.headers,
-    };
-
-    // 토큰이 있으면 Authorization 헤더에 추가
-    if (this.token) {
-      headers['Authorization'] = `Bearer ${this.token}`;
-    }
-
-    const response = await fetch(url, {
-      ...options,
-      headers,
-    });
-
-    if (!response.ok) {
-      const error = await response.json().catch(() => ({ message: '요청에 실패했습니다.' }));
-      throw new Error(error.message || '요청에 실패했습니다.');
-    }
-
-    return response.json();
   }
 
   setToken(token: string | null) {
@@ -387,5 +355,5 @@ class ApiClient {
   }
 }
 
-export const apiClient = new ApiClient(API_BASE_URL);
+export const apiClient = new ApiClient();
 

@@ -32,7 +32,7 @@ function App() {
     checkSession();
 
     // Supabase 인증 상태 변경 리스너
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       if (session && !profile) {
         await loadProfileFromServer();
       } else if (!session && profile) {

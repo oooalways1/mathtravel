@@ -15,7 +15,6 @@ const GamePlay = () => {
   const nextProblem = useGameStore((state) => state.nextProblem);
   const endSession = useGameStore((state) => state.endSession);
   const startSessionFromStore = useGameStore((state) => state.startSession);
-  const settings = useGameStore((state) => state.settings);
 
   const [userInput, setUserInput] = useState('');
   const [remainderInput, setRemainderInput] = useState('');
