@@ -41,18 +41,33 @@ const Leaderboard = ({ type, limit = 10, showUserRank = true }: LeaderboardProps
   const buildLocalEntry = (): LeaderboardEntry | null => {
     if (!profile) return null;
 
+    const character = profile.character ?? {
+      level: 1,
+      experience: 0,
+      avatar: '🙂',
+      items: [],
+    };
+    const stats = profile.stats ?? {
+      totalProblems: 0,
+      totalTime: 0,
+      correctAnswers: 0,
+      singleModeScore: 0,
+      battleModeScore: 0,
+      miniGameScore: 0,
+    };
+
     return {
       id: profile.id,
       username: profile.name,
       name: profile.name,
-      coins: profile.coins,
-      level: profile.character.level,
-      totalProblems: profile.stats.totalProblems,
-      totalTime: profile.stats.totalTime,
-      correctAnswers: profile.stats.correctAnswers,
-      singleModeScore: profile.stats.singleModeScore ?? profile.stats.correctAnswers * 100,
-      battleModeScore: profile.stats.battleModeScore ?? 0,
-      miniGameScore: profile.stats.miniGameScore ?? 0,
+      coins: profile.coins ?? 0,
+      level: character.level ?? 1,
+      totalProblems: stats.totalProblems ?? 0,
+      totalTime: stats.totalTime ?? 0,
+      correctAnswers: stats.correctAnswers ?? 0,
+      singleModeScore: stats.singleModeScore ?? (stats.correctAnswers ?? 0) * 100,
+      battleModeScore: stats.battleModeScore ?? 0,
+      miniGameScore: stats.miniGameScore ?? 0,
       createdAt: profile.createdAt,
     };
   };
