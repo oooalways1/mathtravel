@@ -54,10 +54,15 @@ const BattleMode = () => {
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const channelRef = useRef<RealtimeChannel | null>(null);
   const isHostRef = useRef(false);
+  const modeRef = useRef<BattleModeState>('menu');
 
   useEffect(() => {
     isHostRef.current = isHost;
   }, [isHost]);
+
+  useEffect(() => {
+    modeRef.current = mode;
+  }, [mode]);
 
   useEffect(() => {
     if (!profile) {
@@ -303,7 +308,7 @@ const BattleMode = () => {
 
   const gameLoop = (isHostStarter: boolean) => {
     const animate = () => {
-      if (mode !== 'playing') return;
+      if (modeRef.current !== 'playing') return;
 
       const now = Date.now();
       
