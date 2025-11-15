@@ -2,12 +2,14 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useGameStore } from '../store/useGameStore';
 import Leaderboard from '../components/Leaderboard';
+import { useAutoplayUnlock } from '../hooks/useAutoplayUnlock';
 
 const Home = () => {
   const navigate = useNavigate();
   const profile = useGameStore((state) => state.profile);
   const logout = useGameStore((state) => state.logout);
   const musicEnabled = useGameStore((state) => state.settings.musicEnabled);
+  const autoplayReady = useAutoplayUnlock();
 
   if (!profile) return null;
 
@@ -90,11 +92,11 @@ const Home = () => {
 
   return (
     <div className="min-h-screen p-4 md:p-8">
-      {musicEnabled && (
+      {musicEnabled && autoplayReady && (
         <iframe
           title="홈 화면 BGM"
           src={`https://www.youtube.com/embed/${homeBgmId}?autoplay=1&loop=1&playlist=${homeBgmId}&controls=0&showinfo=0`}
-          allow="autoplay"
+          allow="autoplay; encrypted-media"
           style={{ position: 'absolute', width: 0, height: 0, border: 0 }}
         />
       )}

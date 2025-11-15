@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { useGameStore } from '../store/useGameStore';
 import { apiClient } from '../utils/api';
 import Leaderboard from '../components/Leaderboard';
+import { useAutoplayUnlock } from '../hooks/useAutoplayUnlock';
 
 type AuthMode = 'login' | 'register' | 'leaderboard';
 
@@ -18,6 +19,7 @@ const Welcome = () => {
   const navigate = useNavigate();
   const { loadProfileFromServer } = useGameStore();
   const musicEnabled = useGameStore((state) => state.settings.musicEnabled);
+  const autoplayReady = useAutoplayUnlock();
   const youtubeVideoId = 'Unfqj83RUOQ';
 
   const handleLogin = async () => {
@@ -97,11 +99,11 @@ const Welcome = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-primary-50 to-primary-100">
-      {musicEnabled && (
+      {musicEnabled && autoplayReady && (
         <iframe
           title="메인 화면 BGM"
           src={`https://www.youtube.com/embed/${youtubeVideoId}?autoplay=1&loop=1&playlist=${youtubeVideoId}&controls=0&showinfo=0`}
-          allow="autoplay"
+          allow="autoplay; encrypted-media"
           style={{ position: 'absolute', width: 0, height: 0, border: 0 }}
         />
       )}
