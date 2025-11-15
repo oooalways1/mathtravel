@@ -8,8 +8,9 @@ const Achievements = () => {
 
   if (!profile) return null;
 
-  const unlockedCount = profile.achievements.filter((a) => a.unlocked).length;
-  const totalCount = profile.achievements.length;
+  const achievements = Array.isArray(profile.achievements) ? profile.achievements : [];
+  const unlockedCount = achievements.filter((a) => a.unlocked).length;
+  const totalCount = achievements.length;
   const completionRate =
     totalCount > 0 ? Math.round((unlockedCount / totalCount) * 100) : 0;
   const starDisplay = Array.from({ length: unlockedCount }).map((_, index) => (
@@ -52,7 +53,7 @@ const Achievements = () => {
 
         {/* 업적 목록 */}
         <div className="space-y-4">
-          {profile.achievements.map((achievement, index) => (
+          {achievements.map((achievement, index) => (
             <motion.div
               key={achievement.id}
               initial={{ opacity: 0, x: -20 }}

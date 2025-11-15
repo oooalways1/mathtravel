@@ -29,6 +29,7 @@ const Home = () => {
   const clothesItem = getEquippedItem('clothes');
   const accessoryItem = getEquippedItem('accessory');
   const baseAvatar = character.avatar || '🙂';
+  const achievements = Array.isArray(profile.achievements) ? profile.achievements : [];
   const homeBgmId = 'oj4OGAAcBb4';
 
   const handleLogout = async () => {
@@ -229,7 +230,7 @@ const Home = () => {
         </motion.div>
 
         {/* 최근 업적 */}
-        {profile.achievements.filter((a) => a.unlocked).length > 0 && (
+        {achievements.filter((a) => a.unlocked).length > 0 && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -241,7 +242,7 @@ const Home = () => {
               최근 달성한 업적
             </h2>
             <div className="flex gap-4 overflow-x-auto pb-2">
-              {profile.achievements
+              {achievements
                 .filter((a) => a.unlocked)
                 .slice(-5)
                 .map((achievement) => (
