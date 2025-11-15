@@ -627,30 +627,66 @@ const BattleMode = () => {
             </div>
           </div>
 
-          {/* 실시간 순위 */}
-          <div className="card">
-            <h2 className="text-xl font-bold mb-4">실시간 순위</h2>
-            <div className="space-y-2">
-              {participants
-                .sort((a, b) => b.score - a.score)
-                .map((participant, index) => (
+          {/* 실시간 순위 + 참가자 리스트 */}
+          <div className="card space-y-6">
+            <div>
+              <h2 className="text-xl font-bold mb-3">실시간 순위</h2>
+              <div className="space-y-2">
+                {participants
+                  .sort((a, b) => b.score - a.score)
+                  .map((participant, index) => (
+                    <div
+                      key={participant.id}
+                      className={`flex items-center justify-between p-2 rounded ${
+                        participant.userId === profile?.id
+                          ? 'bg-primary-100 border-2 border-primary-500'
+                          : 'bg-gray-50'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2">
+                        <span className="font-bold">{index + 1}위</span>
+                        <span className={participant.userId === profile?.id ? 'font-bold' : ''}>
+                          {participant.name}
+                        </span>
+                      </div>
+                      <div className="font-bold text-primary-600">{participant.score}점</div>
+                    </div>
+                  ))}
+                {participants.length === 0 && (
+                  <div className="text-sm text-gray-500 text-center">참가자가 아직 없습니다.</div>
+                )}
+              </div>
+            </div>
+
+            <div>
+              <h2 className="text-xl font-bold mb-3">참가자 리스트</h2>
+              <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
+                {participants.map((participant) => (
                   <div
-                    key={participant.id}
+                    key={`list-${participant.id}`}
                     className={`flex items-center justify-between p-2 rounded ${
                       participant.userId === profile?.id
-                        ? 'bg-primary-100 border-2 border-primary-500'
-                        : 'bg-gray-50'
+                        ? 'bg-primary-50 border border-primary-400'
+                        : 'bg-gray-100'
                     }`}
                   >
-                    <div className="flex items-center gap-2">
-                      <span className="font-bold">{index + 1}위</span>
-                      <span className={participant.userId === profile?.id ? 'font-bold' : ''}>
-                        {participant.name}
-                      </span>
+                    <div className="flex items-center gap-3">
+                      <span className="text-lg">{participant.name}</span>
+                      {participant.userId === profile?.id && (
+                        <span className="text-xs px-2 py-1 rounded-full bg-primary-100 text-primary-600">
+                          나
+                        </span>
+                      )}
                     </div>
-                    <div className="font-bold text-primary-600">{participant.score}점</div>
+                    <div className="text-sm text-gray-600">
+                      정답 {participant.correctCount}개 · 점수 {participant.score}
+                    </div>
                   </div>
                 ))}
+                {participants.length === 0 && (
+                  <div className="text-sm text-gray-500 text-center">참가자가 아직 없습니다.</div>
+                )}
+              </div>
             </div>
           </div>
         </div>
